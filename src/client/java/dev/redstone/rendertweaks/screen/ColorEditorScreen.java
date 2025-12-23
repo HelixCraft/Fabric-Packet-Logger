@@ -35,8 +35,8 @@ public class ColorEditorScreen extends Screen {
     private boolean draggingA = false;
     private boolean draggingH = false, draggingS = false, draggingV = false;
 
-    // Widgets
-    private TextFieldWidget hField, sField, vField;
+    // Widgets - no hField (H controlled by vertical bar)
+    private TextFieldWidget sField, vField;
     private TextFieldWidget rField, gField, bField, aField;
     private TextFieldWidget hexField;
 
@@ -71,18 +71,15 @@ public class ColorEditorScreen extends Screen {
 
         MinecraftClient client = MinecraftClient.getInstance();
 
-        // HSV Inputs
-        hField = createInputField(client, inputX, inputY, inputWidth, inputHeight);
-        hField.setChangedListener(s -> updateFromHSVFields());
-        inputY += rowSpacing;
-        
+        // Input fields - aligned with sliders: S, V, R, G, B, A
+        // H is controlled by vertical hue bar only
         sField = createInputField(client, inputX, inputY, inputWidth, inputHeight);
         sField.setChangedListener(s -> updateFromHSVFields());
         inputY += rowSpacing;
         
         vField = createInputField(client, inputX, inputY, inputWidth, inputHeight);
         vField.setChangedListener(s -> updateFromHSVFields());
-        inputY += rowSpacing; // Spacer
+        inputY += rowSpacing;
         
         // RGB Inputs
         rField = createInputField(client, inputX, inputY, inputWidth, inputHeight);
@@ -137,10 +134,8 @@ public class ColorEditorScreen extends Screen {
     private void updateFromHSVFields() {
         if (isUpdatingFields) return;
         try {
-            float h = Float.parseFloat(hField.getText());
             float s = Float.parseFloat(sField.getText()) / 100f;
             float v = Float.parseFloat(vField.getText()) / 100f;
-            this.hue = MathHelper.clamp(h, 0, 360);
             this.saturation = MathHelper.clamp(s, 0, 1);
             this.value = MathHelper.clamp(v, 0, 1);
             updateFields(false); // Update others, keep focus
@@ -197,7 +192,7 @@ public class ColorEditorScreen extends Screen {
         int[] rgb = hsvToRgb(hue, saturation, value);
         int a = (int)(alpha * 255);
 
-        if (forceAll || !hField.isFocused()) hField.setText(String.valueOf((int)hue));
+        // S and V fields (no H field anymore)
         if (forceAll || !sField.isFocused()) sField.setText(String.valueOf((int)(saturation * 100)));
         if (forceAll || !vField.isFocused()) vField.setText(String.valueOf((int)(value * 100)));
 
@@ -305,7 +300,7 @@ public class ColorEditorScreen extends Screen {
     }
 
     private void renderParameterSliders(DrawContext context, int x, int y, int mouseX, int mouseY) {
-        String[] labels = {"S:", "V:", "R:", "G:", "B:", "A:"};  // Removed "H:" - redundant with vertical bar
+        String[] labels = {"S:", "V:", "R:", "G:", "B:", "A:"};
         float[] vals = {saturation, value, 0, 0, 0, alpha};
         int[] rgb = hsvToRgb(hue, saturation, value);
         vals[2] = rgb[0]/255f; vals[3] = rgb[1]/255f; vals[4] = rgb[2]/255f;
@@ -315,8 +310,9 @@ public class ColorEditorScreen extends Screen {
             context.drawText(this.textRenderer, labels[i], x, cy + 2, 0xFFFFFF, false);
             
             int barX = x + 15;
-            // Draw Slider Background (Track)
-            drawSliderTrack(context, barX, cy, i + 1);  // +1 to skip H (type 0)
+            // Map slider types: S=1, V=2, R=3, G=4, B=5, A=6
+            int sliderType = i + 1;
+            drawSliderTrack(context, barX, cy, sliderType);
             
             // Draw Handle
             int handleX = barX + (int)(vals[i] * SLIDER_WIDTH);
@@ -328,21 +324,42 @@ public class ColorEditorScreen extends Screen {
         int w = SLIDER_WIDTH;
         int h = SLIDER_HEIGHT;
         
-        // Optimize slider drawing with gradients where possible
-        if (type == 1) { // Saturation (White -> Red/Hue)
-             context.fillGradient(x, y, x + w, y + h, 0xFFFFFFFF, hsvToRgbInt(hue, 1f, value)); 
-             // Note: MC gradient is vertical by default in some mappings, but fillGradient(x1,y1,x2,y2, start, end) is usually vertical. 
-             // For horizontal gradient we need a helper or just loop (100 pixels is okay, 10000 was the problem).
-             // Let's stick to a loop for horizontal gradients properly or use the utility if available.
-             // Falling back to loop for horizontal gradients but ONLY 100 iterations.
-        } 
-        
-        // Since horizontal gradient is not standard in DrawContext without rotating, we loop width.
-        // But 100 iterations is fine. 100*100 was the issue.
-        for (int i = 0; i < w; i++) {
-            float t = i / (float)w;
-            int color = getSliderColor(type, t);
-            context.fill(x + i, y, x + i + 1, y + h, color);
+        // Alpha slider needs special checkerboard rendering
+        if (type == 6) {
+            // Draw checkerboard background first
+            for (int px = 0; px < w; px++) {
+                for (int py = 0; py < h; py++) {
+                    boolean isLight = ((px / 4) + (py / 4)) % 2 == 0;
+                    int bgColor = isLight ? 0xFFC0C0C0 : 0xFF808080;
+                    context.fill(x + px, y + py, x + px + 1, y + py + 1, bgColor);
+                }
+            }
+            // Now blend current color on top with increasing alpha
+            int[] rgb = hsvToRgb(hue, saturation, value);
+            for (int px = 0; px < w; px++) {
+                float t = px / (float)w;
+                int a = (int)(t * 255);
+                // Blend with checkerboard
+                for (int py = 0; py < h; py++) {
+                    boolean isLight = ((px / 4) + (py / 4)) % 2 == 0;
+                    int bgR = isLight ? 0xC0 : 0x80;
+                    int bgG = isLight ? 0xC0 : 0x80;
+                    int bgB = isLight ? 0xC0 : 0x80;
+                    
+                    int finalR = (rgb[0] * a + bgR * (255 - a)) / 255;
+                    int finalG = (rgb[1] * a + bgG * (255 - a)) / 255;
+                    int finalB = (rgb[2] * a + bgB * (255 - a)) / 255;
+                    
+                    context.fill(x + px, y + py, x + px + 1, y + py + 1, packArgb(255, finalR, finalG, finalB));
+                }
+            }
+        } else {
+            // Normal slider - horizontal gradient via loop
+            for (int i = 0; i < w; i++) {
+                float t = i / (float)w;
+                int color = getSliderColor(type, t);
+                context.fill(x + i, y, x + i + 1, y + h, color);
+            }
         }
         
         context.drawBorder(x - 1, y - 1, w + 2, h + 2, 0xFF444444);
@@ -351,29 +368,12 @@ public class ColorEditorScreen extends Screen {
     private int getSliderColor(int type, float t) {
         int[] rgb = hsvToRgb(hue, saturation, value);
         switch (type) {
-            case 0: return hsvToRgbInt(t * 360f, 1f, 1f); // Hue (not used anymore in sliders)
             case 1: return hsvToRgbInt(hue, t, value); // Saturation
             case 2: return hsvToRgbInt(hue, saturation, t); // Value
             case 3: return packArgb(255, (int)(t*255), rgb[1], rgb[2]); // R
             case 4: return packArgb(255, rgb[0], (int)(t*255), rgb[2]); // G
             case 5: return packArgb(255, rgb[0], rgb[1], (int)(t*255)); // B
-            case 6: { // Alpha - from transparent (checkerboard) to current color
-                int a = (int)(t * 255);
-                // Blend current color with checkerboard pattern based on alpha
-                boolean isLight = iPixel(t * SLIDER_WIDTH, 0);
-                int bgColor = isLight ? 0xC0C0C0 : 0x808080;
-                
-                // Blend background with current color using alpha
-                int bgR = (bgColor >> 16) & 0xFF;
-                int bgG = (bgColor >> 8) & 0xFF;
-                int bgB = bgColor & 0xFF;
-                
-                int finalR = (rgb[0] * a + bgR * (255 - a)) / 255;
-                int finalG = (rgb[1] * a + bgG * (255 - a)) / 255;
-                int finalB = (rgb[2] * a + bgB * (255 - a)) / 255;
-                
-                return packArgb(255, finalR, finalG, finalB);
-            }
+            // case 6 (Alpha) is handled separately in drawSliderTrack
             default: return 0xFFFFFFFF;
         }
     }
@@ -416,13 +416,14 @@ public class ColorEditorScreen extends Screen {
             return true;
         }
 
-        // Parameter Sliders
+        // Parameter Sliders - Map correctly: i=0->S(type1), i=1->V(type2), i=2->R(type3), i=3->G(type4), i=4->B(type5), i=5->A(type6)
         int slidersX = hueX + HUE_WIDTH + 10 + 15; // +15 for the text offset
-        for (int i = 0; i < 6; i++) {  // Changed from 7 to 6 (removed H slider)
+        for (int i = 0; i < 6; i++) {
             int cy = startY + i * 20;
             if (isMouseOver(mouseX, mouseY, slidersX, cy, SLIDER_WIDTH, SLIDER_HEIGHT)) {
-                setDragging(i + 1, true);  // +1 to skip H (type 0)
-                updateSlider(i + 1, mouseX, slidersX);
+                int sliderType = i + 1; // S=1, V=2, R=3, G=4, B=5, A=6
+                setDragging(sliderType, true);
+                updateSlider(sliderType, mouseX, slidersX);
                 return true;
             }
         }
@@ -444,9 +445,10 @@ public class ColorEditorScreen extends Screen {
         }
         
         int slidersX = startX + SV_SIZE + 10 + HUE_WIDTH + 10 + 15;
-        for (int i = 0; i < 6; i++) {  // Changed from 7 to 6
-            if (isDragging(i + 1)) {  // +1 to skip H (type 0)
-                updateSlider(i + 1, mouseX, slidersX);
+        for (int i = 0; i < 6; i++) {
+            int sliderType = i + 1; // S=1, V=2, R=3, G=4, B=5, A=6
+            if (isDragging(sliderType)) {
+                updateSlider(sliderType, mouseX, slidersX);
                 return true;
             }
         }
