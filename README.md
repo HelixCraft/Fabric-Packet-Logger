@@ -1,6 +1,14 @@
 # Package Logger
 
-A deep packet logging mod for Minecraft Fabric that captures all network traffic (S2C and C2S) with full NBT/Component data.
+A deep packet logging mod for Minecraft Fabric that captures all network traffic (´S2C´ and ´C2S´) with full NBT/Component data.
+
+## Use Cases
+
+- **Mod Development**: Debug network communication between client and server
+- **Container Inspection**: View exact contents of inventories with full NBT/Component data and copying them
+- **Reverse Engineering**: Analyze server-side mechanics and packet structures
+- **Anti-Cheat Analysis**: Understand what data the server sends and receives
+- **Learning**: Understand how Minecraft's network protocol works
 
 ## Usage
 
@@ -94,3 +102,187 @@ src/client/java/dev/redstone/packagelogger/
 └── screen/
     └── SimpleConfigScreen.java    # Config UI
 ```
+
+## Available Packets
+
+### S2C Packets (Server → Client)
+
+<details>
+<summary>Click to expand (108 packets)</summary>
+
+- AdvancementUpdateS2CPacket
+- BlockBreakingProgressS2CPacket
+- BlockEntityUpdateS2CPacket
+- BlockEventS2CPacket
+- BlockUpdateS2CPacket
+- BossBarS2CPacket
+- BundleS2CPacket
+- ChangeUnlockedRecipesS2CPacket
+- ChatMessageS2CPacket
+- ChatSuggestionsS2CPacket
+- ChunkBiomeDataS2CPacket
+- ChunkDataS2CPacket
+- ChunkDeltaUpdateS2CPacket
+- ChunkLoadDistanceS2CPacket
+- ChunkRenderDistanceCenterS2CPacket
+- ChunkSentS2CPacket
+- ClearTitleS2CPacket
+- CloseScreenS2CPacket
+- CommandSuggestionsS2CPacket
+- CommandTreeS2CPacket
+- CooldownUpdateS2CPacket
+- CraftFailedResponseS2CPacket
+- DamageTiltS2CPacket
+- DeathMessageS2CPacket
+- DebugSampleS2CPacket
+- DifficultyS2CPacket
+- EndCombatS2CPacket
+- EnterCombatS2CPacket
+- EnterReconfigurationS2CPacket
+- EntitiesDestroyS2CPacket
+- EntityAnimationS2CPacket
+- EntityAttachS2CPacket
+- EntityAttributesS2CPacket
+- EntityDamageS2CPacket
+- EntityEquipmentUpdateS2CPacket
+- EntityPassengersSetS2CPacket
+- EntityPositionS2CPacket
+- EntityS2CPacket
+- EntitySetHeadYawS2CPacket
+- EntitySpawnS2CPacket
+- EntityStatusEffectS2CPacket
+- EntityStatusS2CPacket
+- EntityTrackerUpdateS2CPacket
+- EntityVelocityUpdateS2CPacket
+- ExperienceBarUpdateS2CPacket
+- ExperienceOrbSpawnS2CPacket
+- ExplosionS2CPacket
+- GameJoinS2CPacket
+- GameMessageS2CPacket
+- GameStateChangeS2CPacket
+- HealthUpdateS2CPacket
+- InventoryS2CPacket
+- ItemPickupAnimationS2CPacket
+- LightUpdateS2CPacket
+- LookAtS2CPacket
+- MapUpdateS2CPacket
+- NbtQueryResponseS2CPacket
+- OpenHorseScreenS2CPacket
+- OpenScreenS2CPacket
+- OpenWrittenBookS2CPacket
+- OverlayMessageS2CPacket
+- ParticleS2CPacket
+- PlayerAbilitiesS2CPacket
+- PlayerActionResponseS2CPacket
+- PlayerListHeaderS2CPacket
+- PlayerListS2CPacket
+- PlayerPositionLookS2CPacket
+- PlayerRemoveS2CPacket
+- PlayerRespawnS2CPacket
+- PlayerSpawnPositionS2CPacket
+- PlaySoundFromEntityS2CPacket
+- PlaySoundS2CPacket
+- ProfilelessChatMessageS2CPacket
+- ProjectilePowerS2CPacket
+- RemoveEntityStatusEffectS2CPacket
+- RemoveMessageS2CPacket
+- ScoreboardDisplayS2CPacket
+- ScoreboardObjectiveUpdateS2CPacket
+- ScoreboardScoreResetS2CPacket
+- ScoreboardScoreUpdateS2CPacket
+- ScreenHandlerPropertyUpdateS2CPacket
+- ScreenHandlerSlotUpdateS2CPacket
+- SelectAdvancementTabS2CPacket
+- ServerMetadataS2CPacket
+- SetCameraEntityS2CPacket
+- SetTradeOffersS2CPacket
+- SignEditorOpenS2CPacket
+- SimulationDistanceS2CPacket
+- StartChunkSendS2CPacket
+- StatisticsS2CPacket
+- StopSoundS2CPacket
+- SubtitleS2CPacket
+- SynchronizeRecipesS2CPacket
+- TeamS2CPacket
+- TickStepS2CPacket
+- TitleFadeS2CPacket
+- TitleS2CPacket
+- UnloadChunkS2CPacket
+- UpdateSelectedSlotS2CPacket
+- UpdateTickRateS2CPacket
+- VehicleMoveS2CPacket
+- WorldBorderCenterChangedS2CPacket
+- WorldBorderInitializeS2CPacket
+- WorldBorderInterpolateSizeS2CPacket
+- WorldBorderSizeChangedS2CPacket
+- WorldBorderWarningBlocksChangedS2CPacket
+- WorldBorderWarningTimeChangedS2CPacket
+- WorldEventS2CPacket
+- WorldTimeUpdateS2CPacket
+
+</details>
+
+### C2S Packets (Client → Server)
+
+<details>
+<summary>Click to expand (47 packets)</summary>
+
+- AcknowledgeChunksC2SPacket
+- AcknowledgeReconfigurationC2SPacket
+- AdvancementTabC2SPacket
+- BoatPaddleStateC2SPacket
+- BookUpdateC2SPacket
+- ButtonClickC2SPacket
+- ChatCommandSignedC2SPacket
+- ChatMessageC2SPacket
+- ClickSlotC2SPacket
+- ClientCommandC2SPacket
+- ClientStatusC2SPacket
+- CloseHandledScreenC2SPacket
+- CommandExecutionC2SPacket
+- CraftRequestC2SPacket
+- CreativeInventoryActionC2SPacket
+- DebugSampleSubscriptionC2SPacket
+- HandSwingC2SPacket
+- JigsawGeneratingC2SPacket
+- MessageAcknowledgmentC2SPacket
+- PickFromInventoryC2SPacket
+- PlayerActionC2SPacket
+- PlayerInputC2SPacket
+- PlayerInteractBlockC2SPacket
+- PlayerInteractEntityC2SPacket
+- PlayerInteractItemC2SPacket
+- PlayerMoveC2SPacket
+- PlayerSessionC2SPacket
+- QueryBlockNbtC2SPacket
+- QueryEntityNbtC2SPacket
+- RecipeBookDataC2SPacket
+- RecipeCategoryOptionsC2SPacket
+- RenameItemC2SPacket
+- RequestCommandCompletionsC2SPacket
+- SelectMerchantTradeC2SPacket
+- SlotChangedStateC2SPacket
+- SpectatorTeleportC2SPacket
+- TeleportConfirmC2SPacket
+- UpdateBeaconC2SPacket
+- UpdateCommandBlockC2SPacket
+- UpdateCommandBlockMinecartC2SPacket
+- UpdateDifficultyC2SPacket
+- UpdateDifficultyLockC2SPacket
+- UpdateJigsawC2SPacket
+- UpdatePlayerAbilitiesC2SPacket
+- UpdateSelectedSlotC2SPacket
+- UpdateSignC2SPacket
+- UpdateStructureBlockC2SPacket
+- VehicleMoveC2SPacket
+
+</details>
+
+## License
+
+MIT
+
+## Credits
+
+- Fabric API Team
+- Minecraft Modding Community
