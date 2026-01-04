@@ -7,6 +7,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Zentrale Konfigurationsklasse für die Mod.
@@ -16,21 +18,35 @@ public class ModConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance()
             .getConfigDir()
-            .resolve("render-tweaks-config.json");
+            .resolve("package-logger-config.json");
     
     private static ModConfig INSTANCE;
     
-    // Beispiel-Konfigurationswerte
-    public boolean exampleBoolean = true;
-    public boolean enableFeature = false;
-    public int exampleInt = 50;
-    public float exampleFloat = 0.75f;
-    public String exampleString = "Hello World";
+    // Package Logger Settings
+    public boolean logPackages = true;
+    public LogMode logMode = LogMode.CHAT;
+    public boolean deepLogging = true; // Detailliertes Logging mit NBT-Daten
+    public List<String> selectedS2CPackages = new ArrayList<>();
+    public List<String> selectedC2SPackages = new ArrayList<>();
     
-    // Color Picker Werte (ARGB Format)
-    public int primaryColor = 0xFFFF0000; // Rot mit voller Deckkraft
-    public int secondaryColor = 0x8000FF00; // Grün mit 50% Deckkraft
-    public int accentColor = 0xFF0080FF; // Blau
+    public enum LogMode {
+        CHAT("Chat"),
+        FILE("File");
+        
+        private final String displayName;
+        
+        LogMode(String displayName) {
+            this.displayName = displayName;
+        }
+        
+        public String getDisplayName() {
+            return displayName;
+        }
+        
+        public LogMode next() {
+            return values()[(ordinal() + 1) % values().length];
+        }
+    }
     
     /**
      * Lädt die Konfiguration aus der Datei oder erstellt eine neue.
@@ -41,6 +57,12 @@ public class ModConfig {
                 try {
                     String json = Files.readString(CONFIG_PATH);
                     INSTANCE = GSON.fromJson(json, ModConfig.class);
+                    if (INSTANCE.selectedS2CPackages == null) {
+                        INSTANCE.selectedS2CPackages = new ArrayList<>();
+                    }
+                    if (INSTANCE.selectedC2SPackages == null) {
+                        INSTANCE.selectedC2SPackages = new ArrayList<>();
+                    }
                 } catch (IOException e) {
                     System.err.println("Fehler beim Laden der Config: " + e.getMessage());
                     INSTANCE = new ModConfig();
