@@ -1,38 +1,49 @@
-# Render Tweaks - Minecraft Fabric Mod
+# Package Logger - Minecraft Fabric Mod
 
-Eine Minecraft 1.21.4 Fabric-Mod mit professionellem Config-Screen und vollwertigem Color Picker.
+A deep packet logging mod for Minecraft 1.21.4 that captures all network traffic with full NBT/Component data.
 
 ## Features
 
-### Config-Screen
-- **Command**: `/configscreen` - Öffnet den Config-Screen jederzeit im Spiel
-- **Persistente Speicherung**: Alle Einstellungen werden automatisch als JSON gespeichert
-- **Verschiedene Widget-Typen**:
-  - Checkboxen für Boolean-Werte
-  - Slider für Integer und Float-Werte
-  - Text-Input-Felder für Strings
-  - **Vollwertiger Color Picker** (siehe unten)
+### Deep Packet Logging
 
-### Color Picker Widget
+- **Full NBT/Component Data**: Unlike simple loggers, this mod extracts ALL data from packets
+- **ItemStack Details**: Item ID, count, enchantments, lore, custom data, attributes
+- **Container Format**: Inventory packets logged in Minecraft NBT-style format
+- **Specialized Unpackers**: Custom handlers for 15+ packet types
 
-Ein professionelles Farbauswahl-Widget mit allen Features moderner Grafiksoftware:
+### Supported Packet Types
 
-✅ **HSV-Farbfläche** - Visuelle Auswahl von Sättigung und Helligkeit  
-✅ **Hue-Slider** - Farbton-Auswahl (0-360°)  
-✅ **Alpha-Slider** - Transparenz-Kontrolle mit Schachbrett-Hintergrund  
-✅ **RGB-Slider** - Einzelne Kontrolle für Rot, Grün, Blau (0-255)  
-✅ **Hex-Anzeige** - Live-Anzeige des Hex-Codes (#AARRGGBB)  
-✅ **Live-Vorschau** - Echtzeit-Vorschau der gewählten Farbe  
-✅ **Bidirektionale Synchronisation** - Alle Eingabemodi aktualisieren sich gegenseitig
+| Packet                             | Logged Data                                 |
+| ---------------------------------- | ------------------------------------------- |
+| `InventoryS2CPacket`               | Full container contents with slot positions |
+| `ScreenHandlerSlotUpdateS2CPacket` | Slot ID + complete item data                |
+| `ClickSlotC2SPacket`               | Action type, modified slots, cursor stack   |
+| `BlockEntityUpdateS2CPacket`       | Position, type, complete NBT                |
+| `EntityTrackerUpdateS2CPacket`     | Entity ID, type, all DataTracker values     |
+| `EntityAttributesS2CPacket`        | All attributes with modifiers               |
+| `ChunkDataS2CPacket`               | BlockEntity NBTs                            |
+| And more...                        |                                             |
 
-**Wichtig**: Dieser Color Picker ist komplett selbst implementiert und verwendet **NICHT** Cloth Config!
+### Session-Based Logging
+
+- New log file created on world/server join
+- New log file when logging is re-enabled
+- Filename includes timestamp and world/server name
+
+### Config Screen
+
+- **Keybind**: Press `R` to open config
+- **Packet Selection**: Dual-list selector for S2C and C2S packets
+- **Log Mode**: Chat or File output
+- **Toggle**: Enable/disable logging
 
 ## Installation
 
-### Voraussetzungen
+### Requirements
+
 - Minecraft 1.21.4
-- Fabric Loader 0.17.2+
-- Fabric API 0.119.4+
+- Fabric Loader 0.16.0+
+- Fabric API
 - Java 21
 
 ### Build
@@ -41,152 +52,67 @@ Ein professionelles Farbauswahl-Widget mit allen Features moderner Grafiksoftwar
 ./gradlew build
 ```
 
-Die fertige Mod-Datei findest du in: `build/libs/render-tweaks-1.0.0.jar`
+Output: `build/libs/package-logger-1.0.0.jar`
 
-### Installation im Spiel
+## Usage
 
-1. Installiere Fabric Loader für Minecraft 1.21.4
-2. Kopiere die JAR-Datei in den `mods`-Ordner
-3. Starte Minecraft
+### Open Config
 
-## Verwendung
+Press `R` in-game or use the keybind settings.
 
-### Config-Screen öffnen
+### Log Files
 
-Im Spiel:
+Logs are saved to:
+
 ```
-/configscreen
-```
-
-### Konfiguration
-
-Die Config wird automatisch gespeichert unter:
-```
-.minecraft/config/render-tweaks-config.json
+.minecraft/config/package-logger/packets_2026-01-04_15-30-45_servername.log
 ```
 
-Beispiel-Config:
+### Example Output
+
+```
+[12:34:56.789] [S2C] InventoryS2CPacket {syncId:2,revision:1,id:"minecraft:generic_9x3",components:{"minecraft:container":[{item:{id:"minecraft:diamond_sword",count:1,components:{"minecraft:enchantments":{levels:{"minecraft:sharpness":5}}}},slot:0}]}}
+```
+
+## Configuration
+
+Config saved at: `.minecraft/config/package-logger-config.json`
+
 ```json
 {
-  "exampleBoolean": true,
-  "enableFeature": false,
-  "exampleInt": 50,
-  "exampleFloat": 0.75,
-  "exampleString": "Hello World",
-  "primaryColor": -65536,
-  "secondaryColor": -2147418368,
-  "accentColor": -16744193
+  "logPackages": true,
+  "logMode": "FILE",
+  "deepLogging": true,
+  "selectedS2CPackages": ["InventoryS2CPacket"],
+  "selectedC2SPackages": ["ClickSlotC2SPacket"]
 }
 ```
 
-**Hinweis**: Farben werden als ARGB-Integer gespeichert (z.B. -65536 = 0xFFFF0000 = Rot).
-
-## Entwicklung
-
-### Projekt-Struktur
+## Project Structure
 
 ```
-src/client/java/dev/redstone/rendertweaks/
-├── RenderTweaksClient.java          # Client-Entrypoint
-├── command/
-│   └── ConfigCommand.java           # /configscreen Command
+src/client/java/dev/redstone/packagelogger/
+├── PackageLoggerClient.java       # Client entrypoint
 ├── config/
-│   └── ModConfig.java               # Config-Datenmodell
-└── gui/
-    ├── ConfigScreen.java            # Haupt-Config-Screen
-    └── widget/
-        └── ColorPickerWidget.java   # Color Picker Widget
+│   └── ModConfig.java             # Configuration
+├── logger/
+│   ├── PacketLogger.java          # Main logger
+│   └── unpacker/                  # Specialized packet unpackers
+│       ├── ItemStackFormatter.java
+│       ├── InventoryS2CUnpacker.java
+│       └── ...
+├── mixin/client/
+│   ├── ClientConnectionMixin.java # Packet interception
+│   └── ...
+└── screen/
+    └── SimpleConfigScreen.java    # Config UI
 ```
 
-### Neue Config-Werte hinzufügen
+## License
 
-1. **Feld in ModConfig.java hinzufügen**:
-```java
-public int myNewValue = 42;
-```
-
-2. **Widget in ConfigScreen.java erstellen**:
-```java
-SliderWidget mySlider = new SliderWidget(...);
-this.addDrawableChild(mySlider);
-```
-
-3. **Wert beim Speichern übernehmen**:
-```java
-config.myNewValue = (int)(mySlider.value * 100);
-config.save();
-```
-
-### Neuen Color Picker hinzufügen
-
-```java
-// In ModConfig.java
-public int myColor = 0xFFFF0000;
-
-// In ConfigScreen.java
-ColorPickerWidget myPicker = new ColorPickerWidget(
-    x, y, 200, 150,
-    config.myColor,
-    color -> config.myColor = color
-);
-this.addDrawableChild(myPicker);
-```
-
-## Dokumentation
-
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Detaillierte Architektur-Dokumentation
-- **[COLOR_PICKER_USAGE.md](COLOR_PICKER_USAGE.md)** - Color Picker Verwendung & Integration
-
-## Technische Details
-
-### Farbformat
-
-Der Color Picker verwendet 32-bit ARGB-Integers:
-
-```
-0xAARRGGBB
-  ││││││└└─ Blau  (0-255)
-  ││││└└─── Grün  (0-255)
-  ││└└───── Rot   (0-255)
-  └└─────── Alpha (0-255)
-```
-
-### HSV-Farbmodell
-
-Intern arbeitet der Color Picker mit HSV (Hue, Saturation, Value):
-- **Hue**: Farbton (0-360°)
-- **Saturation**: Sättigung (0-1)
-- **Value**: Helligkeit (0-1)
-
-Die Konvertierung zwischen RGB und HSV erfolgt automatisch.
-
-## Lizenz
-
-CC0-1.0 (Public Domain)
+MIT
 
 ## Credits
 
 - Fabric API Team
 - Minecraft Modding Community
-
-## Support
-
-Bei Fragen oder Problemen:
-1. Prüfe die Dokumentation in `ARCHITECTURE.md`
-2. Schaue in `COLOR_PICKER_USAGE.md` für Color Picker Details
-3. Erstelle ein Issue auf GitHub
-
-## Roadmap
-
-Mögliche zukünftige Features:
-- [ ] Scrollbarer Config-Screen
-- [ ] Kategorien/Tabs für Organisation
-- [ ] Farb-Presets
-- [ ] Import/Export von Configs
-- [ ] Keybind-Widgets
-- [ ] Dropdown-Menüs
-- [ ] Tooltip-System
-
----
-
-**Viel Spaß mit der Mod!** 🎨

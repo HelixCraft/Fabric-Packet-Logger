@@ -28,7 +28,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"render-tweaks" {
+		"package-logger" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}

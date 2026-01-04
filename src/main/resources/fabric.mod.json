@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
-  "id": "render-tweaks",
+  "id": "package-logger",
   "version": "${version}",
-  "name": "Render Tweaks",
-  "description": "This is an example description! Tell everyone what your mod is about!",
-  "authors": ["Me!"],
+  "name": "Package Logger",
+  "description": "Deep Packet Logger for Minecraft - logs all network packets with full NBT/Component data",
+  "authors": ["HelixCraft"],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://github.com/HelixCraft/Fabric-Package-Logger",
+    "sources": "https://github.com/HelixCraft/Fabric-Package-Logger"
   },
-  "license": "CC0-1.0",
-  "icon": "assets/render-tweaks/icon.png",
-  "environment": "*",
+  "license": "MIT",
+  "icon": "assets/package-logger/icon.png",
+  "environment": "client",
   "entrypoints": {
-    "main": ["dev.redstone.rendertweaks.RenderTweaks"],
-    "client": ["dev.redstone.rendertweaks.RenderTweaksClient"]
+    "main": ["dev.redstone.packagelogger.PackageLogger"],
+    "client": ["dev.redstone.packagelogger.PackageLoggerClient"]
   },
   "mixins": [
-    "render-tweaks.mixins.json",
+    "package-logger.mixins.json",
     {
-      "config": "render-tweaks.client.mixins.json",
+      "config": "package-logger.client.mixins.json",
       "environment": "client"
     }
   ],
@@ -28,8 +28,5 @@
     "minecraft": "~1.21.4",
     "java": ">=21",
     "fabric-api": "*"
-  },
-  "suggests": {
-    "another-mod": "*"
   }
 }
