@@ -46,20 +46,10 @@ A new log file is created when:
 ```
 [12:34:56.789] [S2C] InventoryS2CPacket {syncId:2,revision:1,id:"minecraft:generic_9x3",components:{"minecraft:container":[{item:{id:"minecraft:diamond_sword",count:1,components:{"minecraft:enchantments":{levels:{"minecraft:sharpness":5}}}},slot:0}]}}
 ```
+### GUI
 
-### Configuration
+<img width="1920" height="1080" alt="grafik" src="https://github.com/user-attachments/assets/573fa4a1-9c0f-445c-993a-486457d556e4" />
 
-Config saved at: `.minecraft/config/package-logger-config.json`
-
-```json
-{
-  "logPackages": true,
-  "logMode": "FILE",
-  "deepLogging": true,
-  "selectedS2CPackages": ["InventoryS2CPacket"],
-  "selectedC2SPackages": ["ClickSlotC2SPacket"]
-}
-```
 
 ## Installation
 
@@ -82,6 +72,20 @@ Download the latest release from the [Releases](https://github.com/HelixCraft/Fa
 ```
 
 Output: `build/libs/package-logger-1.0.0.jar`
+
+### Configuration
+
+Config saved at: `.minecraft/config/package-logger-config.json`
+
+```json
+{
+  "logPackages": true,
+  "logMode": "FILE",
+  "deepLogging": true,
+  "selectedS2CPackages": ["InventoryS2CPacket"],
+  "selectedC2SPackages": ["ClickSlotC2SPacket"]
+}
+```
 
 ### Project Structure
 
