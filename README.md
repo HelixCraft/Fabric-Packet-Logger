@@ -1,5 +1,10 @@
 # Packet Logger
 
+![Environment](https://img.shields.io/badge/Environment-Client-purple)
+[![Java 21](https://img.shields.io/badge/Language-Java%2021-orange)](https://www.oracle.com/java/technologies/downloads/#java21)
+[![Modrinth](https://img.shields.io/badge/Modrinth-Packet--Logger-00AF5C?logo=modrinth)](https://modrinth.com/mod/packet-logger)
+
+
 A deep packet logging mod for Minecraft Fabric that captures all network traffic (´S2C´ and ´C2S´) with full NBT/Component data.
 
 ## Use Cases
@@ -46,32 +51,38 @@ A new log file is created when:
 ```
 [12:34:56.789] [S2C] InventoryS2CPacket {syncId:2,revision:1,id:"minecraft:generic_9x3",components:{"minecraft:container":[{item:{id:"minecraft:diamond_sword",count:1,components:{"minecraft:enchantments":{levels:{"minecraft:sharpness":5}}}},slot:0}]}}
 ```
-### GUI
 
-<img width="1920" height="1080" alt="grafik" src="https://github.com/user-attachments/assets/573fa4a1-9c0f-445c-993a-486457d556e4" />
+### Configuration
 
 Config saved at: `.minecraft/config/packet-logger-config.json`
- ```json
- {
-   "logPackets": true,
-   "logMode": "FILE",
-   "deepLogging": true,
-   "selectedS2CPackets": ["InventoryS2CPacket"],
-   "selectedC2SPackets": ["ClickSlotC2SPacket"]
- }
- ```
+
+```json
+{
+  "logPackets": true,
+  "logMode": "FILE",
+  "deepLogging": true,
+  "selectedS2CPackets": ["InventoryS2CPacket"],
+  "selectedC2SPackets": ["ClickSlotC2SPacket"]
+}
+```
 
 ## Installation
 
 ### Requirements
 
-- Minecraft 1.21.4
+- Minecraft 1.21 - 1.21.11
 - Fabric Loader 0.16.0+
-- Fabric API
+- Fabric API <br> <a href="https://modrinth.com/mod/fabric-api"><img src="https://cdn.modrinth.com/data/cached_images/cf4bfd9c2896b8f63cd7db479ceccc0578610b21.webp" width="200" alt="Fabric API on Modrinth"></a>
 
 ### Download
 
-Download the latest release from the [Releases](https://github.com/HelixCraft/Fabric-Packet-Logger/releases) page and place it in your `mods` folder.
+You can download the mod from Modrinth. Simply place the downloaded `.jar` file into your `.minecraft/mods` folder.
+
+[**Download on Modrinth**](https://modrinth.com/mod/fabric-packet-logger)
+
+<a href="https://modrinth.com/mod/fabric-packet-logger">
+  <img src="https://github.com/user-attachments/assets/6bc92930-84f9-4eb1-ae1d-8f79775b87c6" width="200" alt="Download on Modrinth">
+</a>
 
 ## For Developers
 
@@ -83,25 +94,11 @@ Download the latest release from the [Releases](https://github.com/HelixCraft/Fa
 
 Output: `build/libs/packet-logger-1.0.0.jar`
 
-### Configuration
-
-Config saved at: `.minecraft/config/package-logger-config.json`
-
-```json
-{
-  "logPackages": true,
-  "logMode": "FILE",
-  "deepLogging": true,
-  "selectedS2CPackages": ["InventoryS2CPacket"],
-  "selectedC2SPackages": ["ClickSlotC2SPacket"]
-}
-```
-
 ### Project Structure
 
 ```
 src/client/java/dev/redstone/packetlogger/
-├── PacketLoggerClient.java       # Client entrypoint
+├── PackageLoggerClient.java       # Client entrypoint
 ├── config/
 │   └── ModConfig.java             # Configuration
 ├── logger/
