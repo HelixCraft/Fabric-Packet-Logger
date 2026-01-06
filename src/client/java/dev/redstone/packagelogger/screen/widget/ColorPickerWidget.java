@@ -108,8 +108,8 @@ public class ColorPickerWidget extends ClickableWidget {
         // Auswahlkreis
         int circleX = x + (int)(saturation * SV_SIZE);
         int circleY = y + (int)((1.0f - value) * SV_SIZE);
-        context.drawBorder(circleX - 4, circleY - 4, 8, 8, 0xFFFFFFFF);
-        context.drawBorder(circleX - 3, circleY - 3, 6, 6, 0xFF000000);
+        dev.redstone.packagelogger.util.DrawUtil.drawBorder(context, circleX - 4, circleY - 4, 8, 8, 0xFFFFFFFF);
+        dev.redstone.packagelogger.util.DrawUtil.drawBorder(context, circleX - 3, circleY - 3, 6, 6, 0xFF000000);
     }
     
     private void renderHueSlider(DrawContext context, int x, int y) {
@@ -187,7 +187,7 @@ public class ColorPickerWidget extends ClickableWidget {
         
         // Farbe
         context.fill(previewX, y, previewX + PREVIEW_SIZE, y + PREVIEW_SIZE, getARGB());
-        context.drawBorder(previewX, y, PREVIEW_SIZE, PREVIEW_SIZE, 0xFF000000);
+        dev.redstone.packagelogger.util.DrawUtil.drawBorder(context, previewX, y, PREVIEW_SIZE, PREVIEW_SIZE, 0xFF000000);
         
         // Hex
         String hex = String.format("#%08X", getARGB());

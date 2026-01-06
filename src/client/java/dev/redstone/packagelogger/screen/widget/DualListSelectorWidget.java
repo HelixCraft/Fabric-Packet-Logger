@@ -134,7 +134,7 @@ public class DualListSelectorWidget implements Drawable, Element, Selectable {
         
         // Hintergrund Panel
         context.fill(x, y, x + width, y + height, 0xC0101010);
-        context.drawBorder(x, y, width, height, 0xFF3A3A3A);
+        dev.redstone.packagelogger.util.DrawUtil.drawBorder(context, x, y, width, height, 0xFF3A3A3A);
         
         // Titel
         context.drawText(textRenderer, title, x + PADDING, y + 2, 0xFFFFFF, false);
@@ -163,7 +163,7 @@ public class DualListSelectorWidget implements Drawable, Element, Selectable {
                                   int mouseX, int mouseY, boolean isLeft, int visibleItems) {
         // Panel Hintergrund
         context.fill(px, py, px + pw, py + ph, 0xFF1A1A1A);
-        context.drawBorder(px, py, pw, ph, 0xFF4A4A4A);
+        dev.redstone.packagelogger.util.DrawUtil.drawBorder(context, px, py, pw, ph, 0xFF4A4A4A);
         
         // Label
         context.drawText(textRenderer, label, px + 2, py - 10, 0xAAAAAA, false);

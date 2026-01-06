@@ -91,11 +91,11 @@ public class ColorSelectorWidget extends ClickableWidget {
         context.fill(boxX, boxY, boxX + BOX_SIZE, boxY + BOX_SIZE, color);
         
         // Border
-        context.drawBorder(boxX, boxY, BOX_SIZE, BOX_SIZE, 0xFF000000);
+        dev.redstone.packagelogger.util.DrawUtil.drawBorder(context, boxX, boxY, BOX_SIZE, BOX_SIZE, 0xFF000000);
         
         // Hover-Effekt
         if (isMouseOverBox(mouseX, mouseY)) {
-            context.drawBorder(boxX - 1, boxY - 1, BOX_SIZE + 2, BOX_SIZE + 2, 0xFFFFFFFF);
+            dev.redstone.packagelogger.util.DrawUtil.drawBorder(context, boxX - 1, boxY - 1, BOX_SIZE + 2, BOX_SIZE + 2, 0xFFFFFFFF);
         }
     }
     
