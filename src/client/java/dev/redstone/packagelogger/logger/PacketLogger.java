@@ -32,43 +32,47 @@ import java.util.Map;
 public class PacketLogger {
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
     private static final DateTimeFormatter FILE_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
-    
+
     private static Path currentLogFile = null;
     private static String currentSessionId = null;
     private static boolean wasLoggingEnabled = false;
-    
+
     private static final Map<Class<?>, PacketUnpacker<?>> UNPACKERS = new HashMap<>();
     private static final Map<Class<?>, String> PACKET_NAMES = new HashMap<>();
-    
+
     static {
         registerUnpackers();
     }
-    
+
     private static void registerUnpackers() {
         // Inventory/Item Pakete
         registerPacket(InventoryS2CPacket.class, "InventoryS2CPacket", new InventoryS2CUnpacker());
-        registerPacket(ScreenHandlerSlotUpdateS2CPacket.class, "ScreenHandlerSlotUpdateS2CPacket", new SlotUpdateS2CUnpacker());
-        registerPacket(CreativeInventoryActionC2SPacket.class, "CreativeInventoryActionC2SPacket", new CreativeInventoryC2SUnpacker());
+        registerPacket(ScreenHandlerSlotUpdateS2CPacket.class, "ScreenHandlerSlotUpdateS2CPacket",
+                new SlotUpdateS2CUnpacker());
+        registerPacket(CreativeInventoryActionC2SPacket.class, "CreativeInventoryActionC2SPacket",
+                new CreativeInventoryC2SUnpacker());
         registerPacket(ClickSlotC2SPacket.class, "ClickSlotC2SPacket", new ClickSlotC2SUnpacker());
 
         // Block Pakete
-        registerPacket(BlockEntityUpdateS2CPacket.class, "BlockEntityUpdateS2CPacket", new BlockEntityUpdateS2CUnpacker());
+        registerPacket(BlockEntityUpdateS2CPacket.class, "BlockEntityUpdateS2CPacket",
+                new BlockEntityUpdateS2CUnpacker());
         registerPacket(BlockUpdateS2CPacket.class, "BlockUpdateS2CPacket", new BlockUpdateS2CUnpacker());
         registerPacket(ChunkDeltaUpdateS2CPacket.class, "ChunkDeltaUpdateS2CPacket", new ChunkDeltaUpdateS2CUnpacker());
-        
+
         // Entity Pakete
-        registerPacket(EntityTrackerUpdateS2CPacket.class, "EntityTrackerUpdateS2CPacket", new EntityTrackerUpdateS2CUnpacker());
+        registerPacket(EntityTrackerUpdateS2CPacket.class, "EntityTrackerUpdateS2CPacket",
+                new EntityTrackerUpdateS2CUnpacker());
         registerPacket(EntityAttributesS2CPacket.class, "EntityAttributesS2CPacket", new EntityAttributesS2CUnpacker());
         registerPacket(EntitySpawnS2CPacket.class, "EntitySpawnS2CPacket", new EntitySpawnS2CUnpacker());
-        
+
         // Chunk Pakete
         registerPacket(ChunkDataS2CPacket.class, "ChunkDataS2CPacket", new ChunkDataS2CUnpacker());
-        
+
         // NBT/Custom Pakete
         registerPacket(NbtQueryResponseS2CPacket.class, "NbtQueryResponseS2CPacket", new NbtQueryResponseS2CUnpacker());
         registerPacket(CustomPayloadS2CPacket.class, "CustomPayloadS2CPacket", new CustomPayloadS2CUnpacker());
         registerPacket(CustomPayloadC2SPacket.class, "CustomPayloadC2SPacket", new CustomPayloadC2SUnpacker());
-        
+
         // Weitere Pakete (nur Namen-Mapping)
         registerPacketName(GameJoinS2CPacket.class, "GameJoinS2CPacket");
         registerPacketName(PlayerPositionLookS2CPacket.class, "PlayerPositionLookS2CPacket");
@@ -85,18 +89,18 @@ public class PacketLogger {
         registerPacketName(PlaySoundS2CPacket.class, "PlaySoundS2CPacket");
         registerPacketName(WorldTimeUpdateS2CPacket.class, "WorldTimeUpdateS2CPacket");
     }
-    
+
     private static <T extends Packet<?>> void registerPacket(Class<T> clazz, String name, PacketUnpacker<T> unpacker) {
         PACKET_NAMES.put(clazz, name);
         if (unpacker != null) {
             UNPACKERS.put(clazz, unpacker);
         }
     }
-    
+
     private static void registerPacketName(Class<?> clazz, String name) {
         PACKET_NAMES.put(clazz, name);
     }
-    
+
     public static void onWorldJoin(String worldName) {
         if (ModConfig.getInstance().logMode == ModConfig.LogMode.FILE) {
             currentSessionId = null;
@@ -104,111 +108,128 @@ public class PacketLogger {
             System.out.println("[PacketLogger] New session started: " + worldName);
         }
     }
-    
+
     public static void onWorldLeave() {
         if (currentLogFile != null && ModConfig.getInstance().logMode == ModConfig.LogMode.FILE) {
             try {
                 synchronized (PacketLogger.class) {
-                    try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(currentLogFile.toFile(), true)))) {
+                    try (PrintWriter writer = new PrintWriter(
+                            new BufferedWriter(new FileWriter(currentLogFile.toFile(), true)))) {
                         writer.println();
                         writer.println("=== Session ended: " + LocalDateTime.now().format(FILE_DATE_FORMAT) + " ===");
                     }
                 }
-            } catch (IOException e) { }
+            } catch (IOException e) {
+            }
         }
         currentSessionId = null;
         currentLogFile = null;
     }
-    
+
     public static void logIncoming(Packet<?> packet) {
         logPacket(packet, true);
     }
-    
+
     public static void logOutgoing(Packet<?> packet) {
         logPacket(packet, false);
     }
 
     private static void logPacket(Packet<?> packet, boolean incoming) {
         ModConfig config = ModConfig.getInstance();
-        
+
         if (config.logPackages && !wasLoggingEnabled && config.logMode == ModConfig.LogMode.FILE) {
             currentSessionId = null;
             currentLogFile = null;
         }
         wasLoggingEnabled = config.logPackages;
-        
-        if (!config.logPackages) return;
-        
+
+        if (!config.logPackages)
+            return;
+
         String simpleName = getDeobfuscatedName(packet);
-        
+
         if (incoming) {
-            if (!shouldLogS2C(simpleName, config)) return;
+            if (!shouldLogS2C(simpleName, config))
+                return;
         } else {
-            if (!shouldLogC2S(simpleName, config)) return;
+            if (!shouldLogC2S(simpleName, config))
+                return;
         }
-        
+
         String timestamp = LocalTime.now().format(TIME_FORMAT);
         String direction = incoming ? "S2C" : "C2S";
         String packetData = unpackPacket(packet);
-        
+
         if (config.logMode == ModConfig.LogMode.CHAT) {
             logToChat(timestamp, direction, simpleName, packetData, incoming);
         } else {
             logToFile(timestamp, direction, simpleName, packetData);
         }
     }
-    
+
     private static String getDeobfuscatedName(Packet<?> packet) {
         Class<?> clazz = packet.getClass();
         String mappedName = PACKET_NAMES.get(clazz);
-        if (mappedName != null) return mappedName;
-        
+        if (mappedName != null)
+            return mappedName;
+
         String simpleName = clazz.getSimpleName();
-        if (simpleName.contains("Packet")) return simpleName;
+        if (simpleName.contains("Packet"))
+            return simpleName;
         return simpleName;
     }
-    
+
     private static boolean shouldLogS2C(String simpleName, ModConfig config) {
-        if (config.selectedS2CPackages.isEmpty()) return false;
+        if (config.selectedS2CPackages.isEmpty())
+            return false;
         for (String selected : config.selectedS2CPackages) {
-            if (simpleName.equals(selected) || simpleName.endsWith(selected)) return true;
+            if (simpleName.equals(selected) || simpleName.endsWith(selected))
+                return true;
         }
         return false;
     }
-    
+
     private static boolean shouldLogC2S(String simpleName, ModConfig config) {
-        if (config.selectedC2SPackages.isEmpty()) return false;
+        if (config.selectedC2SPackages.isEmpty())
+            return false;
         for (String selected : config.selectedC2SPackages) {
-            if (simpleName.equals(selected) || simpleName.endsWith(selected)) return true;
+            if (simpleName.equals(selected) || simpleName.endsWith(selected))
+                return true;
         }
         return false;
     }
-    
+
     @SuppressWarnings("unchecked")
     private static String unpackPacket(Packet<?> packet) {
         try {
             PacketUnpacker<Packet<?>> unpacker = (PacketUnpacker<Packet<?>>) UNPACKERS.get(packet.getClass());
-            if (unpacker != null) return unpacker.unpack(packet);
+            if (unpacker != null)
+                return unpacker.unpack(packet);
             return ReflectionUnpacker.unpackWithReflection(packet);
         } catch (Exception e) {
             return "{error: \"" + e.getMessage() + "\"}";
         }
     }
 
-    private static void logToChat(String timestamp, String direction, String packetName, String packetData, boolean incoming) {
+    private static void logToChat(String timestamp, String direction, String packetName, String packetData,
+            boolean incoming) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.inGameHud == null || client.inGameHud.getChatHud() == null) return;
-        
-        MutableText timeText = Text.literal("[" + timestamp + "] ").formatted(Formatting.GRAY);
-        MutableText dirText = Text.literal("[" + direction + "] ").formatted(incoming ? Formatting.GREEN : Formatting.RED);
-        MutableText nameText = Text.literal(packetName + " ").formatted(Formatting.YELLOW);
-        String shortData = packetData.length() > 300 ? packetData.substring(0, 300) + "..." : packetData;
-        MutableText dataText = Text.literal(shortData).formatted(Formatting.WHITE);
-        
-        MutableText fullMessage = Text.empty().append(timeText).append(dirText).append(nameText).append(dataText);
-        client.inGameHud.getChatHud().addMessage(fullMessage);
+        client.execute(() -> {
+            if (client.inGameHud == null || client.inGameHud.getChatHud() == null)
+                return;
+
+            MutableText timeText = Text.literal("[" + timestamp + "] ").formatted(Formatting.GRAY);
+            MutableText dirText = Text.literal("[" + direction + "] ")
+                    .formatted(incoming ? Formatting.GREEN : Formatting.RED);
+            MutableText nameText = Text.literal(packetName + " ").formatted(Formatting.YELLOW);
+            String shortData = packetData.length() > 300 ? packetData.substring(0, 300) + "..." : packetData;
+            MutableText dataText = Text.literal(shortData).formatted(Formatting.WHITE);
+
+            MutableText fullMessage = Text.empty().append(timeText).append(dirText).append(nameText).append(dataText);
+            client.inGameHud.getChatHud().addMessage(fullMessage);
+        });
     }
-    
+
     private static void logToFile(String timestamp, String direction, String packetName, String packetData) {
         try {
             Path logFile = getLogFile();
@@ -222,18 +243,18 @@ public class PacketLogger {
             System.err.println("[PacketLogger] Error writing to log file: " + e.getMessage());
         }
     }
-    
+
     private static Path getLogFile() throws IOException {
         if (currentSessionId == null || currentLogFile == null) {
             currentSessionId = LocalDateTime.now().format(FILE_DATE_FORMAT);
             Path configDir = FabricLoader.getInstance().getConfigDir();
             Path logDir = configDir.resolve("package-logger");
             Files.createDirectories(logDir);
-            
+
             String worldName = getWorldName();
             String fileName = "packets_" + currentSessionId + "_" + worldName + ".log";
             currentLogFile = logDir.resolve(fileName);
-            
+
             try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(currentLogFile.toFile())))) {
                 writer.println("=== Deep Packet Logger ===");
                 writer.println("Session: " + currentSessionId);
@@ -246,7 +267,7 @@ public class PacketLogger {
         }
         return currentLogFile;
     }
-    
+
     private static String getWorldName() {
         try {
             MinecraftClient client = MinecraftClient.getInstance();
@@ -258,12 +279,14 @@ public class PacketLogger {
                     return sanitizeFileName(client.getServer().getSaveProperties().getLevelName());
                 }
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
         return "unknown";
     }
-    
+
     private static String sanitizeFileName(String name) {
-        if (name == null) return "unknown";
+        if (name == null)
+            return "unknown";
         return name.replaceAll("[^a-zA-Z0-9._-]", "_").replaceAll("_+", "_").substring(0, Math.min(name.length(), 50));
     }
 }

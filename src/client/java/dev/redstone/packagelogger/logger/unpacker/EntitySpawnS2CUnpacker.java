@@ -39,9 +39,9 @@ public class EntitySpawnS2CUnpacker implements PacketUnpacker<EntitySpawnS2CPack
         .append(",headYaw:").append(packet.getHeadYaw()).append("}");
 
     // Velocity
-    sb.append(",velocity:{x:").append(packet.getVelocityX())
-        .append(",y:").append(packet.getVelocityY())
-        .append(",z:").append(packet.getVelocityZ()).append("}");
+    sb.append(",velocity:{x:").append(packet.getVelocity().getX())
+        .append(",y:").append(packet.getVelocity().getY())
+        .append(",z:").append(packet.getVelocity().getZ()).append("}");
 
     // Entity Data (z.B. für Projectiles die Owner-ID)
     int entityData = packet.getEntityData();

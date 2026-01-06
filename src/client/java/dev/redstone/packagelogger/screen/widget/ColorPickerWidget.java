@@ -6,6 +6,7 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
+import net.minecraft.client.gui.Click;
 import java.util.function.Consumer;
 
 /**
@@ -196,9 +197,13 @@ public class ColorPickerWidget extends ClickableWidget {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(Click click, boolean isRelease) {
         if (!this.active || !this.visible)
             return false;
+
+        double mouseX = click.x();
+        double mouseY = click.y();
+        int button = click.button();
 
         int currentY = getY();
 
@@ -245,11 +250,13 @@ public class ColorPickerWidget extends ClickableWidget {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(Click click, double deltaX, double deltaY) {
+        double mouseX = click.x();
+
         int currentY = getY();
 
         if (draggingSV) {
-            updateSV(mouseX, mouseY, currentY);
+            updateSV(mouseX, click.y(), currentY);
             return true;
         }
         currentY += SV_SIZE + SPACING + 10;
@@ -283,7 +290,7 @@ public class ColorPickerWidget extends ClickableWidget {
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(Click click) {
         draggingSV = false;
         draggingHue = false;
         draggingAlpha = false;

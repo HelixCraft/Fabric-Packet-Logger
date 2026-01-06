@@ -7,6 +7,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.CharInput;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -309,24 +311,24 @@ public class SimpleConfigScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (s2cSelector != null && s2cSelector.keyPressed(keyCode, scanCode, modifiers)) {
+    public boolean keyPressed(KeyInput input) {
+        if (s2cSelector != null && s2cSelector.keyPressed(input)) {
             return true;
         }
-        if (c2sSelector != null && c2sSelector.keyPressed(keyCode, scanCode, modifiers)) {
+        if (c2sSelector != null && c2sSelector.keyPressed(input)) {
             return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(input);
     }
 
     @Override
-    public boolean charTyped(char chr, int modifiers) {
-        if (s2cSelector != null && s2cSelector.charTyped(chr, modifiers)) {
+    public boolean charTyped(CharInput input) {
+        if (s2cSelector != null && s2cSelector.charTyped(input)) {
             return true;
         }
-        if (c2sSelector != null && c2sSelector.charTyped(chr, modifiers)) {
+        if (c2sSelector != null && c2sSelector.charTyped(input)) {
             return true;
         }
-        return super.charTyped(chr, modifiers);
+        return super.charTyped(input);
     }
 }

@@ -8,6 +8,8 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
+import dev.redstone.packagelogger.util.DrawUtil;
+import net.minecraft.client.gui.Click;
 import java.util.function.Consumer;
 
 public class ColorEditorScreen extends Screen {
@@ -237,7 +239,7 @@ public class ColorEditorScreen extends Screen {
 
         // Dialog Background
         context.fill(dialogX, dialogY, dialogX + dialogWidth, dialogY + dialogHeight, 0xFF000000);
-        context.drawBorder(dialogX, dialogY, dialogWidth, dialogHeight, 0xFFFFFFFF);
+        DrawUtil.drawBorder(context, dialogX, dialogY, dialogWidth, dialogHeight, 0xFFFFFFFF);
 
         context.drawText(this.textRenderer, "", dialogX + PADDING, dialogY + PADDING, 0xFFFFFF, false);
 
@@ -252,7 +254,7 @@ public class ColorEditorScreen extends Screen {
         // Checkerboard pattern for alpha
         fillCheckerboard(context, startX, previewY, SV_SIZE, PREVIEW_HEIGHT);
         context.fill(startX, previewY, startX + SV_SIZE, previewY + PREVIEW_HEIGHT, getARGB());
-        context.drawBorder(startX, previewY, SV_SIZE, PREVIEW_HEIGHT, 0xFF888888);
+        DrawUtil.drawBorder(context, startX, previewY, SV_SIZE, PREVIEW_HEIGHT, 0xFF888888);
 
         // 3. Hue Slider (Optimized with Gradients)
         int hueX = startX + SV_SIZE + 10;
@@ -292,8 +294,8 @@ public class ColorEditorScreen extends Screen {
         // Selection Circle
         int circleX = x + (int) (saturation * SV_SIZE);
         int circleY = y + (int) ((1.0f - value) * SV_SIZE);
-        context.drawBorder(circleX - 2, circleY - 2, 5, 5, 0xFF000000); // Inner black
-        context.drawBorder(circleX - 3, circleY - 3, 7, 7, 0xFFFFFFFF); // Outer white
+        DrawUtil.drawBorder(context, circleX - 2, circleY - 2, 5, 5, 0xFF000000); // Inner black
+        DrawUtil.drawBorder(context, circleX - 3, circleY - 3, 7, 7, 0xFFFFFFFF); // Outer white
     }
 
     private void renderHueSlider(DrawContext context, int x, int y) {
@@ -380,7 +382,7 @@ public class ColorEditorScreen extends Screen {
             }
         }
 
-        context.drawBorder(x - 1, y - 1, w + 2, h + 2, 0xFF444444);
+        DrawUtil.drawBorder(context, x - 1, y - 1, w + 2, h + 2, 0xFF444444);
     }
 
     private int getSliderColor(int type, float t) {
@@ -419,9 +421,13 @@ public class ColorEditorScreen extends Screen {
     /* --- Mouse Interaction --- */
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (super.mouseClicked(mouseX, mouseY, button))
+    public boolean mouseClicked(Click click, boolean isRelease) {
+        if (super.mouseClicked(click, isRelease))
             return true;
+
+        double mouseX = click.x();
+        double mouseY = click.y();
+        int button = click.button();
 
         int startX = dialogX + PADDING;
         int startY = dialogY + 30;
@@ -457,7 +463,12 @@ public class ColorEditorScreen extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(Click click, double deltaX, double deltaY) {
+        double mouseX = click.x(); // Or click.x(), verification needed for accessor names, assuming x()/y() since
+                                   // it's a record
+        double mouseY = click.y();
+        int button = click.button();
+
         int startX = dialogX + PADDING;
         int startY = dialogY + 30;
 
@@ -479,15 +490,19 @@ public class ColorEditorScreen extends Screen {
             }
         }
 
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return super.mouseDragged(click, deltaX, deltaY);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(Click click) {
+        // double mouseX = click.x();
+        // double mouseY = click.y();
+        // int button = click.button();
+
         draggingSV = false;
         draggingHue = false;
         draggingH = draggingS = draggingV = draggingR = draggingG = draggingB = draggingA = false;
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(click);
     }
 
     private void updateSV(double mouseX, double mouseY, int x, int y) {

@@ -9,6 +9,9 @@ import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
+import net.minecraft.client.gui.Click;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.CharInput;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -247,7 +250,11 @@ public class DualListSelectorWidget implements Drawable, Element, Selectable {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(Click click, boolean isRelease) {
+        double mouseX = click.x();
+        double mouseY = click.y();
+        int button = click.button();
+
         // Check if click is on search field (use our known coordinates)
         int sfX = x + PADDING;
         int sfY = y + SEARCH_FIELD_Y_OFFSET;
@@ -257,7 +264,7 @@ public class DualListSelectorWidget implements Drawable, Element, Selectable {
         if (mouseX >= sfX && mouseX < sfX + sfW && mouseY >= sfY && mouseY < sfY + sfH) {
             searchField.setFocused(true);
             this.focused = true;
-            searchField.mouseClicked(mouseX, mouseY, button);
+            searchField.mouseClicked(click, isRelease);
             return true;
         } else {
             searchField.setFocused(false);
@@ -334,13 +341,13 @@ public class DualListSelectorWidget implements Drawable, Element, Selectable {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        return searchField.keyPressed(keyCode, scanCode, modifiers);
+    public boolean keyPressed(KeyInput input) {
+        return searchField.keyPressed(input);
     }
 
     @Override
-    public boolean charTyped(char chr, int modifiers) {
-        return searchField.charTyped(chr, modifiers);
+    public boolean charTyped(CharInput input) {
+        return searchField.charTyped(input);
     }
 
     public TextFieldWidget getSearchField() {
