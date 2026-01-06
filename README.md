@@ -1,5 +1,10 @@
 # Packet Logger
 
+![Environment](https://img.shields.io/badge/Environment-Client-purple)
+[![Java 21](https://img.shields.io/badge/Language-Java%2021-orange)](https://www.oracle.com/java/technologies/downloads/#java21)
+[![Modrinth](https://img.shields.io/badge/Modrinth-Packet--Logger-00AF5C?logo=modrinth)](https://modrinth.com/mod/packet-logger)
+
+
 A deep packet logging mod for Minecraft Fabric that captures all network traffic (´S2C´ and ´C2S´) with full NBT/Component data.
 
 ## Use Cases
@@ -65,13 +70,19 @@ Config saved at: `.minecraft/config/packet-logger-config.json`
 
 ### Requirements
 
-- Minecraft 1.21.4
+- Minecraft 1.21 - 1.21.11
 - Fabric Loader 0.16.0+
-- Fabric API
+- Fabric API <br> <a href="https://modrinth.com/mod/fabric-api"><img src="https://cdn.modrinth.com/data/cached_images/cf4bfd9c2896b8f63cd7db479ceccc0578610b21.webp" width="200" alt="Fabric API on Modrinth"></a>
 
 ### Download
 
-Download the latest release from the [Releases](https://github.com/HelixCraft/Fabric-Packet-Logger/releases) page and place it in your `mods` folder.
+You can download the mod from Modrinth. Simply place the downloaded `.jar` file into your `.minecraft/mods` folder.
+
+[**Download on Modrinth**](https://modrinth.com/mod/fabric-packet-logger)
+
+<a href="https://modrinth.com/mod/fabric-packet-logger">
+  <img src="https://github.com/user-attachments/assets/6bc92930-84f9-4eb1-ae1d-8f79775b87c6" width="200" alt="Download on Modrinth">
+</a>
 
 ## For Developers
 
