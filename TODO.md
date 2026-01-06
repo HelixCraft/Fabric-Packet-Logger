@@ -1,6 +1,6 @@
 # Task: Minecraft 1.21.5 - 1.21.8 Support Fixes
 
-- [x] Investigate missing `dev.redstone.packagelogger.util` package
+- [x] Investigate missing `dev.redstone.packetlogger.util` package
 - [x] Fix `DrawUtil` placement and package declaration
 - [x] Refactor UI Widgets to 1.21.5+ API (Click, KeyInput, CharInput) [/]
 - [x] Fix text visibility in Lists (Alpha channel) [x]
