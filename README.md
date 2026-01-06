@@ -33,7 +33,7 @@ Use the dual-list selector to choose which packets to log:
 Logs are saved to:
 
 ```
-MINECRAFT_FOLDER/config/package-logger/packets_2026-01-04_15-30-45_servername.log
+MINECRAFT_FOLDER/config/packet-logger/packets_2026-01-04_15-30-45_servername.log
 ```
 
 A new log file is created when:
@@ -50,6 +50,17 @@ A new log file is created when:
 
 <img width="1920" height="1080" alt="grafik" src="https://github.com/user-attachments/assets/573fa4a1-9c0f-445c-993a-486457d556e4" />
 
+Config saved at: `.minecraft/config/packet-logger-config.json`
+ 
+ ```json
+ {
+   "logPackets": true,
+   "logMode": "FILE",
+   "deepLogging": true,
+   "selectedS2CPackets": ["InventoryS2CPacket"],
+   "selectedC2SPackets": ["ClickSlotC2SPacket"]
+ }
+ ```
 
 ## Installation
 
@@ -71,7 +82,7 @@ Download the latest release from the [Releases](https://github.com/HelixCraft/Fa
 ./gradlew build
 ```
 
-Output: `build/libs/package-logger-1.0.0.jar`
+Output: `build/libs/packet-logger-1.0.0.jar`
 
 ### Configuration
 
@@ -90,8 +101,8 @@ Config saved at: `.minecraft/config/package-logger-config.json`
 ### Project Structure
 
 ```
-src/client/java/dev/redstone/packagelogger/
-├── PackageLoggerClient.java       # Client entrypoint
+src/client/java/dev/redstone/packetlogger/
+├── PacketLoggerClient.java       # Client entrypoint
 ├── config/
 │   └── ModConfig.java             # Configuration
 ├── logger/
